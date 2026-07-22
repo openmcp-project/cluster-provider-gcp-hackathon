@@ -1,0 +1,164 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  labels:
+    openmcp.cloud/cluster: platform
+  name: providerconfigs.gcp.cluster.open-control-plane.io
+spec:
+  group: gcp.cluster.open-control-plane.io
+  names:
+    kind: ProviderConfig
+    listKind: ProviderConfigList
+    plural: providerconfigs
+    singular: providerconfig
+    shortNames:
+    - gcpcfg
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ProviderConfig is the Schema for the GCP cluster provider configuration.
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec defines the desired state of ProviderConfig
+            properties:
+              providerRef:
+                description: ProviderRef is a reference to the ClusterProvider resource this configuration belongs to.
+                properties:
+                  name:
+                    type: string
+                required:
+                - name
+                type: object
+                x-kubernetes-validations:
+                - message: providerRef is immutable
+                  rule: self == oldSelf
+              projectID:
+                description: ProjectID is the GCP project ID in which to create GKE clusters.
+                minLength: 1
+                type: string
+              region:
+                description: Region is the GCP region in which to create GKE clusters.
+                minLength: 1
+                type: string
+              credentialsSecretRef:
+                description: CredentialsSecretRef references a Secret containing GCP credentials.
+                properties:
+                  name:
+                    description: Name is the name of the secret.
+                    minLength: 1
+                    type: string
+                  namespace:
+                    description: Namespace is the namespace of the secret.
+                    minLength: 1
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+              clusterTemplate:
+                description: ClusterTemplate contains default settings applied to all GKE clusters.
+                properties:
+                  initialNodeCount:
+                    default: 1
+                    description: InitialNodeCount is the number of nodes in the default node pool.
+                    format: int32
+                    minimum: 0
+                    type: integer
+                  machineType:
+                    description: MachineType is the GCP machine type for the default node pool.
+                    type: string
+                  diskSizeGB:
+                    description: DiskSizeGB is the disk size in GB for each node.
+                    format: int32
+                    minimum: 10
+                    type: integer
+                  network:
+                    description: Network is the VPC network name or self-link.
+                    type: string
+                  subnetwork:
+                    description: Subnetwork is the VPC subnetwork name or self-link.
+                    type: string
+                type: object
+            required:
+            - providerRef
+            - projectID
+            - region
+            - credentialsSecretRef
+            type: object
+          status:
+            description: status defines the observed state of ProviderConfig
+            properties:
+              conditions:
+                description: Conditions contains the conditions.
+                items:
+                  description: Condition contains details for one aspect of the current state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              observedGeneration:
+                description: ObservedGeneration is the generation of this resource that was last reconciled.
+                format: int64
+                type: integer
+              phase:
+                description: Phase is the current phase of the resource.
+                type: string
+            required:
+            - observedGeneration
+            - phase
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
