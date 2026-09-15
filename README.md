@@ -1,5 +1,8 @@
 # ClusterProvider: GCP (GKE)
 
+> [!WARNING]
+> This project is experimental and was created as a proof of concept during a hackathon. It is not suitable for use in production environments.
+
 A [ClusterProvider](https://github.com/openmcp-project/docs) for [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine). It reconciles `Cluster` resources by creating and managing GKE clusters via the [GKE API](https://cloud.google.com/go/docs/reference/cloud.google.com/go/container/latest/apiv1) and grants access to them via `AccessRequest` resources.
 
 ---
